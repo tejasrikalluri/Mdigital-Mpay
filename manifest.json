@@ -1,0 +1,17 @@
+{
+  "platform-version": "2.2",
+  "product": {
+    "freshservice": {
+      "events": {
+        "onTicketCreate": {
+          "handler": "onTicketCreateHandler"
+        }
+      }
+    }
+  },
+  "whitelisted-domains": [],
+  "engines": {
+    "node": "14.17.3",
+    "fdk": "8.6.4"
+  }
+}
