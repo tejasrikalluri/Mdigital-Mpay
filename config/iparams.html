@@ -40,11 +40,11 @@
             <fw-input label="Mondia Pay domain" id="domain_mp" required clear-input>
         </div>
         <div class="apiKey">
-            <fw-input label="Mondia Pay API key" id="apiKeysn" type="password" required clear-input>
+            <fw-input label="Mondia Pay API key" id="apiKeymp" type="password" required clear-input>
         </div>
-        <div class="error_div_sn red"></div>
+        <div class="error_div_mp red"></div>
         <div class="authenticate_sn">
-            <fw-button color="Primary" id="authBtn_sn">Authenticate</fw-button>
+            <fw-button color="Primary" id="authBtn_mp">Authenticate</fw-button>
         </div>
     </div>
     <script type="text/javascript">
@@ -52,32 +52,32 @@
             var domain = $("#domain").val();
             var api_key = $("#apiKey").val();
             var domain_mp = $("#domain_mp").val();
-            var apiKeySn = $("#apiKeysn").val();
+            var apiKeyMp = $("#apiKeymp").val();
             return {
                 __meta: {
-                    secure: ["api_key,apiKeySn"]
+                    secure: ["api_key,apiKeyMp"]
                 },
                 domain: domain,
-                api_key: api_key, domain_mp: domain_mp, apiKeySn: apiKeySn
+                api_key: api_key, domain_mp: domain_mp, apiKeyMp: apiKeyMp
             };
         }
         function getConfigs(configs) {
             $("#domain").val(configs.domain);
             $("#apiKey").val(configs.api_key);
             $("#domain_mp").val(configs.domain_mp);
-            $("#apiKeysn").val(configs.apiKeySn);
+            $("#apiKeymp").val(configs.apiKeyMp);
         }
         function validate() {
             let isValid = true;
             var btnText = $("#authBtn").text();
-            var authBtn_sn = $("#authBtn_sn").text();
+            var authBtn_mp = $("#authBtn_mp").text();
 
             if ($(".authentication").is(":visible") && btnText === "Authenticate") {
                 $(".error_div").html("Please click Authenticate button for further installation").fadeOut(5000);
                 isValid = false;
             }
-            else if ($(".sn_authentication").is(":visible") && authBtn_sn === "Authenticate") {
-                $(".error_div_sn").html("Please click Authenticate button for further installation").fadeOut(5000);
+            else if ($(".sn_authentication").is(":visible") && authBtn_mp === "Authenticate") {
+                $(".error_div_mp").html("Please click Authenticate button for further installation").fadeOut(5000);
                 isValid = false;
             }
             else

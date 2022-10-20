@@ -4,14 +4,14 @@ app.initialized().then(function (client) {
     $(document).on('click', '#authBtn', function () {
         $("#authBtn").prop("disabled", true);
         if ($("#apiKey").val().trim() === "") {
-            $("#apiKey").attr("state-text", "Please enter Freshservice API Key");
+            $("#apiKey").attr("state-text", "Please enter Mondia Digital API key");
             $("#apiKey").attr("state", "error");
         } else {
             $("#apiKey").removeAttr("state-text");
             $("#apiKey").removeAttr("state");
         }
         if ($("#domain").val().trim() === "") {
-            $("#domain").attr("state-text", "Please enter Freshservice Domain");
+            $("#domain").attr("state-text", "Please enter Mondia Digital domain");
             $("#domain").attr("state", "error");
         } else {
             $("#domain").removeAttr("state-text");
@@ -22,10 +22,10 @@ app.initialized().then(function (client) {
             getTicketFields(client);
         } else buttonEnable("authBtn");
     });
-    $(document).on('click', '#authBtn_sn', function () {
-        $("#authBtn_sn").prop("disabled", true);
+    $(document).on('click', '#authBtn_mp', function () {
+        $("#authBtn_mp").prop("disabled", true);
         if ($("#apiKeysn").val().trim() === "") {
-            $("#apiKeysn").attr("state-text", "Please enter Freshservice API Key");
+            $("#apiKeysn").attr("state-text", "Please enter Mondia Digital API key");
             $("#apiKeysn").attr("state", "error");
         } else {
             $("#apiKeysn").removeAttr("state-text");
@@ -39,12 +39,11 @@ app.initialized().then(function (client) {
             $("#domain_mp").removeAttr("state");
         }
         if ($("#apiKeysn").val().trim() !== "" && $("#domain_mp").val().trim() !== "") {
-            $("#authBtn_sn").text("Authenticating...");
-            getTicketFieldsSn(client);
-        } else buttonEnable("authBtn_sn");
+            $("#authBtn_mp").text("Authenticating...");
+            getTicketFieldsMp(client);
+        } else buttonEnable("authBtn_mp");
     });
     $(document).on('fwFocus', '#domain,#apiKey,#apiKeysn,#domain_mp', function () {
-        console.log("Fffffffffffffffff")
         $("#domain").removeAttr("state-text");
         $("#domain").removeAttr("state");
         $("#apiKey").removeAttr("state-text");
@@ -53,8 +52,8 @@ app.initialized().then(function (client) {
         $("#domain_mp").removeAttr("state");
         $("#apiKeysn").removeAttr("state-text");
         $("#apiKeysn").removeAttr("state");
-        $(".error_div,.error_div_sn").html("");
-        buttonEnable("authBtn_sn");buttonEnable("authBtn");
+        $(".error_div,.error_div_mp").html("");
+        buttonEnable("authBtn_mp");buttonEnable("authBtn");
     });
 
 }, function (error) {
@@ -75,17 +74,17 @@ function getTicketFields(client) {
         buttonEnable("authBtn");
     });
 }
-function getTicketFieldsSn(client) {
+function getTicketFieldsMp(client) {
     var domain = $("#domain_mp").val();
     var api_key = $("#apiKeysn").val();
     var headers = { "Authorization": "Basic " + btoa(domain + ":" + api_key) };
     var options = { headers: headers };
     var url = `https://alternativestaging.service-now.com/api/now/table/u_freshservice_ticket`;
     client.request.get(url, options).then(function () {
-        $("#authBtn_sn").text("Authenticated");
+        $("#authBtn_mp").text("Authenticated");
     }, function (error) {
-        handleError(error, "error_div_sn");
-        buttonEnable("authBtn_sn");
+        handleError(error, "error_div_mp");
+        buttonEnable("authBtn_mp");
     });
 }
 function buttonEnable(btnId) {
