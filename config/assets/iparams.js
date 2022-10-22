@@ -1,6 +1,6 @@
 app.initialized().then(function (client) {
     window.client = client;
-    $(".sn_authentication").hide();
+    $(".sn_authentication,.custom_checkbox").hide();
     $(document).on('click', '#authBtn', function () {
         $("#authBtn").prop("disabled", true);
         if ($("#apiKey").val().trim() === "") {
@@ -43,6 +43,7 @@ app.initialized().then(function (client) {
             getTicketFieldsMp(client);
         } else buttonEnable("authBtn_mp");
     });
+    $("#validateCheckox").click(checkBoxSelectValidation);
     $(document).on('fwFocus', '#domain,#apiKey,#apiKeymp,#domain_mp', function () {
         $("#domain").removeAttr("state-text");
         $("#domain").removeAttr("state");
@@ -59,20 +60,40 @@ app.initialized().then(function (client) {
 }, function (error) {
     handleError(error, "error_div");
 });
+let checkBoxSelectValidation = () => {
+    console.log($("#checkboxes").val())
+};
+
 function getTicketFields(client) {
     var domain = $("#domain").val();
     var api_key = $("#apiKey").val();
     var headers = { "Authorization": "Basic " + btoa(api_key) };
     var options = { headers: headers };
-    var url = `https://${domain}/api/v2/tickets?per_page=1&page=1`;
-    client.request.get(url, options).then(function () {
+    var url = `https://${domain}/api/v2/ticket_form_fields`;
+    client.request.get(url, options).then(function (data) {
         $("#authBtn").text("Authenticated");
         $(".authentication").hide();
-        $(".sn_authentication").show();
+        appendCheckboxes(data);
     }, function (error) {
         handleError(error, "error_div");
         buttonEnable("authBtn");
     });
+}
+let appendCheckboxes = (data) => {
+    try {
+        let ticket_fields = JSON.parse(data.response).ticket_fields;
+        let custom_checkboxes = ticket_fields.filter(type => type.field_type === 'custom_checkbox');
+        let optionArr = [];
+        let checkboxSelectElement = `<fw-select label="Choose custom checkbox" required="true">`;
+        for (const key in custom_checkboxes) {
+            checkboxSelectElement += `<fw-select-option value=${custom_checkboxes[key].id}>${custom_checkboxes[key].label}</fw-select-option>`;
+        }
+        checkboxSelectElement += '</fw-select>';
+        $("#validateBtnDiv").prepend(checkboxSelectElement);
+        $(".custom_checkbox").show();
+    } catch (error) {
+        console.log(error);
+    }
 }
 function getTicketFieldsMp(client) {
     var domain = $("#domain_mp").val();
