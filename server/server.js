@@ -1,9 +1,8 @@
 exports = {
-
-  // args is a JSON block containing the payload information.
-  // args['iparam'] will contain the installation parameter values.
-  onTicketCreateHandler: function(args) {
-    console.log('Hello ' + args['data']['requester']['name']);
+  onTicketCreateHandler: (args) => {
+    const { type_name } = args.data.ticket;
+    console.log(type_name)
+      (type_name === "Incident") ? console.log("Incident is created") : console.log("Service request is created")
   }
 
 };

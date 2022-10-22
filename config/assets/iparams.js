@@ -24,36 +24,36 @@ app.initialized().then(function (client) {
     });
     $(document).on('click', '#authBtn_mp', function () {
         $("#authBtn_mp").prop("disabled", true);
-        if ($("#apiKeysn").val().trim() === "") {
-            $("#apiKeysn").attr("state-text", "Please enter Mondia Digital API key");
-            $("#apiKeysn").attr("state", "error");
+        if ($("#apiKeymp").val().trim() === "") {
+            $("#apiKeymp").attr("state-text", "Please enter Mondia Pay API key");
+            $("#apiKeymp").attr("state", "error");
         } else {
-            $("#apiKeysn").removeAttr("state-text");
-            $("#apiKeysn").removeAttr("state");
+            $("#apiKeymp").removeAttr("state-text");
+            $("#apiKeymp").removeAttr("state");
         }
         if ($("#domain_mp").val().trim() === "") {
-            $("#domain_mp").attr("state-text", "Please enter Servicenow Username");
+            $("#domain_mp").attr("state-text", "Please enter Mondia Pay domain");
             $("#domain_mp").attr("state", "error");
         } else {
             $("#domain_mp").removeAttr("state-text");
             $("#domain_mp").removeAttr("state");
         }
-        if ($("#apiKeysn").val().trim() !== "" && $("#domain_mp").val().trim() !== "") {
+        if ($("#apiKeymp").val().trim() !== "" && $("#domain_mp").val().trim() !== "") {
             $("#authBtn_mp").text("Authenticating...");
             getTicketFieldsMp(client);
         } else buttonEnable("authBtn_mp");
     });
-    $(document).on('fwFocus', '#domain,#apiKey,#apiKeysn,#domain_mp', function () {
+    $(document).on('fwFocus', '#domain,#apiKey,#apiKeymp,#domain_mp', function () {
         $("#domain").removeAttr("state-text");
         $("#domain").removeAttr("state");
         $("#apiKey").removeAttr("state-text");
         $("#apiKey").removeAttr("state");
         $("#domain_mp").removeAttr("state-text");
         $("#domain_mp").removeAttr("state");
-        $("#apiKeysn").removeAttr("state-text");
-        $("#apiKeysn").removeAttr("state");
+        $("#apiKeymp").removeAttr("state-text");
+        $("#apiKeymp").removeAttr("state");
         $(".error_div,.error_div_mp").html("");
-        buttonEnable("authBtn_mp");buttonEnable("authBtn");
+        buttonEnable("authBtn_mp"); buttonEnable("authBtn");
     });
 
 }, function (error) {
@@ -76,10 +76,10 @@ function getTicketFields(client) {
 }
 function getTicketFieldsMp(client) {
     var domain = $("#domain_mp").val();
-    var api_key = $("#apiKeysn").val();
-    var headers = { "Authorization": "Basic " + btoa(domain + ":" + api_key) };
+    var api_key = $("#apiKeymp").val();
+    var headers = { "Authorization": "Basic " + btoa(api_key) };
     var options = { headers: headers };
-    var url = `https://alternativestaging.service-now.com/api/now/table/u_freshservice_ticket`;
+    var url = `https://${domain}/api/v2/tickets?per_page=1&page=1`;
     client.request.get(url, options).then(function () {
         $("#authBtn_mp").text("Authenticated");
     }, function (error) {
