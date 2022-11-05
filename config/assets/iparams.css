@@ -7,6 +7,10 @@ fw-input {
     width: 60% !important;
 }
 
+fw-select {
+    width: 29%;
+}
+
 .error_div {
     color: red;
     margin-bottom: 3px !important;

@@ -35,9 +35,16 @@
             <fw-button color="Primary" id="authBtn">Authenticate</fw-button>
         </div>
     </div>
-    <div class="custom_checkbox">
+    <div class="custom_checkbox align">
+        <div class="error_div_cc red"></div>
         <div id="validateBtnDiv">
             <fw-button color="Primary" id="validateCheckox">Validate</fw-button>
+        </div>
+    </div>
+    <div class="custom_checkbox_mp align">
+        <div class="error_cc_mp red"></div>
+        <div id="validateBtnMp">
+            <fw-button color="Primary" id="validateCheckoxMp">Validate</fw-button>
         </div>
     </div>
     <div class="sn_authentication align">
@@ -76,13 +83,17 @@
             let isValid = true;
             var btnText = $("#authBtn").text();
             var authBtn_mp = $("#authBtn_mp").text();
-
+            var validateCheckox = $("#validateCheckox").text();
             if ($(".authentication").is(":visible") && btnText === "Authenticate") {
-                $(".error_div").html("Please click Authenticate button for further installation").fadeOut(5000);
+                $(".error_div").html("Please click Authenticate button for further installation");
                 isValid = false;
             }
             else if ($(".sn_authentication").is(":visible") && authBtn_mp === "Authenticate") {
-                $(".error_div_mp").html("Please click Authenticate button for further installation").fadeOut(5000);
+                $(".error_div_mp").html("Please click Authenticate button for further installation");
+                isValid = false;
+            }
+            else if ($(".custom_checkbox").is(":visible") && validateCheckox === "Validate") {
+                $(".error_div_cc").html("Please click validate button for further installation");
                 isValid = false;
             }
             else

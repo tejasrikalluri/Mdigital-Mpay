@@ -44,15 +44,8 @@ app.initialized().then(function (client) {
         } else buttonEnable("authBtn_mp");
     });
     $("#validateCheckox").click(checkBoxSelectValidation);
-    $(document).on('fwFocus', '#domain,#apiKey,#apiKeymp,#domain_mp', function () {
-        $("#domain").removeAttr("state-text");
-        $("#domain").removeAttr("state");
-        $("#apiKey").removeAttr("state-text");
-        $("#apiKey").removeAttr("state");
-        $("#domain_mp").removeAttr("state-text");
-        $("#domain_mp").removeAttr("state");
-        $("#apiKeymp").removeAttr("state-text");
-        $("#apiKeymp").removeAttr("state");
+    $(document).on('fwFocus', '#domain,#apiKey,#apiKeymp,#domain_mp,#checkboxes', function () {
+        iterateRemoveAttr(['domain', 'apiKey', 'domain_mp', 'apiKeymp', 'checkboxes'])
         $(".error_div,.error_div_mp").html("");
         buttonEnable("authBtn_mp"); buttonEnable("authBtn");
     });
@@ -61,9 +54,21 @@ app.initialized().then(function (client) {
     handleError(error, "error_div");
 });
 let checkBoxSelectValidation = () => {
-    console.log($("#checkboxes").val())
+    if (!$("#checkboxes").val()) {
+        $("#checkboxes").attr("state-text", "Please choose checkbox field");
+        $("#checkboxes").attr("state", "error");
+    } else {
+        $(".custom_checkbox").hide();
+        $(".sn_authentication").show();
+    }
 };
 
+let iterateRemoveAttr = (ids) => {
+    ids.forEach(element => {
+        $(`#${element}`).removeAttr("state-text");
+        $(`#${element}`).removeAttr("state");
+    });
+}
 function getTicketFields(client) {
     var domain = $("#domain").val();
     var api_key = $("#apiKey").val();
@@ -83,8 +88,7 @@ let appendCheckboxes = (data) => {
     try {
         let ticket_fields = JSON.parse(data.response).ticket_fields;
         let custom_checkboxes = ticket_fields.filter(type => type.field_type === 'custom_checkbox');
-        let optionArr = [];
-        let checkboxSelectElement = `<fw-select label="Choose custom checkbox" required="true">`;
+        let checkboxSelectElement = `<fw-select id="checkboxes" placeholder="Choose custom checkbox" label="Choose checkbox in mondia digital" required="true">`;
         for (const key in custom_checkboxes) {
             checkboxSelectElement += `<fw-select-option value=${custom_checkboxes[key].id}>${custom_checkboxes[key].label}</fw-select-option>`;
         }
@@ -102,7 +106,8 @@ function getTicketFieldsMp(client) {
     var options = { headers: headers };
     var url = `https://${domain}/api/v2/tickets?per_page=1&page=1`;
     client.request.get(url, options).then(function () {
-        $("#authBtn_mp").text("Authenticated");
+        $(".custom_checkbox").hide();
+        $(".sn_authentication").show();
     }, function (error) {
         handleError(error, "error_div_mp");
         buttonEnable("authBtn_mp");
@@ -114,7 +119,6 @@ function buttonEnable(btnId) {
 }
 
 function handleError(error, errorid) {
-    console.log(error)
     $('.' + errorid).show();
     if (error.status === 400) {
         $('.' + errorid).html("Invalid Input entered, please verify the fields and try again.");
