@@ -3,6 +3,9 @@
   "product": {
     "freshservice": {
       "events": {
+        "onTicketCreate": {
+          "handler": "onTicketCreateHandler"
+        }
       }
     }
   },

@@ -1,6 +1,6 @@
 app.initialized().then(function (client) {
     window.client = client;
-    $(".sn_authentication,.custom_checkbox").hide();
+    $(".sn_authentication,.custom_checkbox,.custom_checkbox_mp").hide();
     $(document).on('click', '#authBtn', function () {
         $("#authBtn").prop("disabled", true);
         if ($("#apiKey").val().trim() === "") {
@@ -44,9 +44,10 @@ app.initialized().then(function (client) {
         } else buttonEnable("authBtn_mp");
     });
     $("#validateCheckox").click(checkBoxSelectValidation);
-    $(document).on('fwFocus', '#domain,#apiKey,#apiKeymp,#domain_mp,#checkboxes', function () {
-        iterateRemoveAttr(['domain', 'apiKey', 'domain_mp', 'apiKeymp', 'checkboxes'])
-        $(".error_div,.error_div_mp").html("");
+    $("#validateCheckoxMp").click(checkBoxSelectValidationMp);
+    $(document).on('fwFocus', '#domain,#apiKey,#apiKeymp,#domain_mp,#checkboxes,#checkboxesMp', function () {
+        iterateRemoveAttr(['domain', 'apiKey', 'domain_mp', 'apiKeymp', 'checkboxes', 'checkboxesMp'])
+        $(".error_div,.error_div_mp,.error_div_cc,.error_cc_mp").html("");
         buttonEnable("authBtn_mp"); buttonEnable("authBtn");
     });
 
@@ -54,13 +55,25 @@ app.initialized().then(function (client) {
     handleError(error, "error_div");
 });
 let checkBoxSelectValidation = () => {
+    $('.error_div_cc').html('');
     if (!$("#checkboxes").val()) {
         $("#checkboxes").attr("state-text", "Please choose checkbox field");
         $("#checkboxes").attr("state", "error");
     } else {
+        checkboxes = $("#checkboxes").val();
+        console.log(checkboxes)
         $(".custom_checkbox").hide();
         $(".sn_authentication").show();
     }
+};
+let checkBoxSelectValidationMp = () => {
+    $('.error_cc_mp').html('');
+    if (!$("#checkboxesMp").val()) {
+        $("#checkboxesMp").attr("state-text", "Please choose checkbox field");
+        $("#checkboxesMp").attr("state", "error");
+    } else
+        $('#validateCheckoxMp').prop("disabled", true).text('Validated');
+    console.log(checkboxes)
 };
 
 let iterateRemoveAttr = (ids) => {
@@ -78,23 +91,39 @@ function getTicketFields(client) {
     client.request.get(url, options).then(function (data) {
         $("#authBtn").text("Authenticated");
         $(".authentication").hide();
-        appendCheckboxes(data);
+        appendCheckboxes(data, "md");
     }, function (error) {
         handleError(error, "error_div");
         buttonEnable("authBtn");
     });
 }
-let appendCheckboxes = (data) => {
+let appendCheckboxes = (data, origin) => {
+    console.log(origin)
     try {
         let ticket_fields = JSON.parse(data.response).ticket_fields;
         let custom_checkboxes = ticket_fields.filter(type => type.field_type === 'custom_checkbox');
-        let checkboxSelectElement = `<fw-select id="checkboxes" placeholder="Choose custom checkbox" label="Choose checkbox in mondia digital" required="true">`;
-        for (const key in custom_checkboxes) {
-            checkboxSelectElement += `<fw-select-option value=${custom_checkboxes[key].id}>${custom_checkboxes[key].label}</fw-select-option>`;
+        if (origin === "md") {
+            let checkboxSelectElement = `<fw-select id="checkboxes" placeholder="Choose custom checkbox" label="Choose checkbox in mondia digital" required="true">`;
+            for (const key in custom_checkboxes) {
+                checkboxSelectElement += `<fw-select-option value=${custom_checkboxes[key].name}>${custom_checkboxes[key].label}</fw-select-option>`;
+            }
+            checkboxSelectElement += '</fw-select>';
+            $("#validateBtnDiv").prepend(checkboxSelectElement);
+            $(".custom_checkbox").show();
+        } else {
+            let checkboxSelectElement = `<fw-select id="checkboxesMp" placeholder="Choose custom checkbox" label="Choose checkbox in mondia pay" required="true">`;
+            for (const key in custom_checkboxes) {
+                console.log(custom_checkboxes[key])
+                checkboxSelectElement += `<fw-select-option value=${custom_checkboxes[key].name}>${custom_checkboxes[key].label}</fw-select-option>`;
+            }
+            checkboxSelectElement += '</fw-select>';
+            $("#validateBtnMp").prepend(checkboxSelectElement);
+            $(".custom_checkbox_mp").show();
         }
-        checkboxSelectElement += '</fw-select>';
-        $("#validateBtnDiv").prepend(checkboxSelectElement);
-        $(".custom_checkbox").show();
+        if (updatedConfigs) {
+            $("#checkboxes").val(updatedConfigs.checkboxes);
+            $("#checkboxesMp").val(updatedConfigs.checkboxesMp);
+        }
     } catch (error) {
         console.log(error);
     }
@@ -104,10 +133,11 @@ function getTicketFieldsMp(client) {
     var api_key = $("#apiKeymp").val();
     var headers = { "Authorization": "Basic " + btoa(api_key) };
     var options = { headers: headers };
-    var url = `https://${domain}/api/v2/tickets?per_page=1&page=1`;
-    client.request.get(url, options).then(function () {
-        $(".custom_checkbox").hide();
-        $(".sn_authentication").show();
+    var url = `https://${domain}/api/v2/ticket_form_fields`;
+    client.request.get(url, options).then(function (data) {
+        $(".custom_checkbox_mp").show();
+        $(".sn_authentication").hide();
+        appendCheckboxes(data, "mp");
     }, function (error) {
         handleError(error, "error_div_mp");
         buttonEnable("authBtn_mp");

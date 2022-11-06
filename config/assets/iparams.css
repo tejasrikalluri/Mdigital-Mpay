@@ -12,7 +12,7 @@ fw-select {
 }
 
 .error_div {
-    color: red;
+    color: #d72d30;
     margin-bottom: 3px !important;
 }
 
@@ -21,7 +21,7 @@ fw-select {
 }
 
 .red {
-    color: red;
+    color: #d72d30;
 }
 
 .align {

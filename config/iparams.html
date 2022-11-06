@@ -60,20 +60,25 @@
         </div>
     </div>
     <script type="text/javascript">
+        let updatedConfigs, checkboxes;
         function postConfigs() {
             var domain = $("#domain").val();
             var api_key = $("#apiKey").val();
             var domain_mp = $("#domain_mp").val();
             var apiKeyMp = $("#apiKeymp").val();
+            var checkboxesMp = $("#checkboxesMp").val();
+            console.log(checkboxes)
             return {
                 __meta: {
                     secure: ["api_key,apiKeyMp"]
                 },
                 domain: domain,
-                api_key: api_key, domain_mp: domain_mp, apiKeyMp: apiKeyMp
+                api_key: api_key, domain_mp: domain_mp, apiKeyMp: apiKeyMp, checkboxes, checkboxesMp
             };
         }
         function getConfigs(configs) {
+            console.log(configs)
+            updatedConfigs = configs;
             $("#domain").val(configs.domain);
             $("#apiKey").val(configs.api_key);
             $("#domain_mp").val(configs.domain_mp);
@@ -84,6 +89,7 @@
             var btnText = $("#authBtn").text();
             var authBtn_mp = $("#authBtn_mp").text();
             var validateCheckox = $("#validateCheckox").text();
+            var validateCheckoxMp = $("#validateCheckoxMp").text();
             if ($(".authentication").is(":visible") && btnText === "Authenticate") {
                 $(".error_div").html("Please click Authenticate button for further installation");
                 isValid = false;
@@ -94,6 +100,10 @@
             }
             else if ($(".custom_checkbox").is(":visible") && validateCheckox === "Validate") {
                 $(".error_div_cc").html("Please click validate button for further installation");
+                isValid = false;
+            }
+            else if ($(".custom_checkbox_mp").is(":visible") && validateCheckoxMp === "Validate") {
+                $(".error_cc_mp").html("Please click validate button for further installation");
                 isValid = false;
             }
             else
