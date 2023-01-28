@@ -15,10 +15,16 @@
       "fr_due_by": "2015-07-14T13:08:06Z",
       "fr_escalated": false,
       "is_escalated": false,
-      "fwd_emails": ["charles@freshservice.com", "diana@freshservice.com"],
-      "reply_cc_emails": ["charles@freshservice.com", "diana@freshservice.com"],
+      "fwd_emails": [
+        "charles@freshservice.com",
+        "diana@freshservice.com"
+      ],
+      "reply_cc_emails": [
+        "charles@freshservice.com",
+        "diana@freshservice.com"
+      ],
       "email_config_id": 77123,
-      "id": 1,
+      "id": 1569,
       "group_id": 351,
       "group_name": "Service Desk",
       "department_id": 2,
@@ -38,15 +44,24 @@
       "impact_name": "Low",
       "type": 1,
       "type_name": "Incident",
-      "tags": ["sales", "marketing"],
+      "tags": [
+        "sales",
+        "marketing"
+      ],
       "spam": false,
       "source": 2,
       "source_name": "Portal",
       "category": "Hardware",
       "sub_category": "Laptop",
       "item_category": "Mac",
-      "cc_emails": ["ram@freshservice.com", "diana@freshservice.com"],
-      "to_emails": ["ram@freshservice.com", "diana@freshservice.com"],
+      "cc_emails": [
+        "ram@freshservice.com",
+        "diana@freshservice.com"
+      ],
+      "to_emails": [
+        "ram@freshservice.com",
+        "diana@freshservice.com"
+      ],
       "created_at": "2015-07-09T13:08:06Z",
       "updated_at": "2015-07-09T13:08:06Z",
       "attachments": [

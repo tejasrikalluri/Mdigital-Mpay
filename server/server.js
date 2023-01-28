@@ -1,28 +1,53 @@
 exports = {
-  onTicketCreateHandler: (args) => {
-    const { type_name, id } = args.data.ticket;
-    console.log(type_name);
-    // (type_name === "Incident") ? console.log("Incident is created") : console.log("Service request is created")
-    console.log(args.iparams)
-    fetchTicketData(id);
+  onTicketCreateHandler: function (args) {
+    console.log("%%%%%%%%%%%%%%%%%%%%")
+    const { id } = args.data.ticket;
+    fetchTicketData(id, args.iparams);
   }
-
 };
-let fetchTicketData = (id) => {
-  var headers = { "Authorization": "Basic <%= encode(iparam.api_key) %>" };
-  var options = { headers: headers };
-  var url = "https://<%= iparam.domain %>/api/v2/tickets/" + id;
-  $request.get(url, options).then(data => {
-    console.log(data)
-    try {
-      let ticketResp = JSON.parse(data.response).ticket;
-      console.log(ticketResp.custom_fields)
-    } catch (error) {
-
-    }
-  }, error => {
+let fetchTicketData = async (id, iparams) => {
+  let err, reply;
+  [err, reply] = await to($request.invokeTemplate("fetchTicketData", { "context": { id } }));
+  console.log(reply);
+  if (err) {
     console.log("@FETCH TICKET DATA")
+    console.log(err);
+  }
+  try {
+    let ticketResp = JSON.parse(reply.response).ticket;
+    const custom_fields = Object.keys(ticketResp.custom_fields).filter((key) => key.includes(iparams.checkboxes)).reduce((obj, key) => {
+      return Object.assign(obj, {
+        [key]: ticketResp.custom_fields[key]
+      });
+    }, {});
+    if (custom_fields[iparams.checkboxes]) formBodyForTicketCreation(ticketResp);
+  } catch (error) {
+    console.log("@CATCH FETCH TICKET DATA")
     console.log(error)
-    console.log(url)
-  });
+  }
+};
+function to(promise, improved) {
+  return promise
+    .then((data) => [null, data])
+    .catch((err) => {
+      if (improved) {
+        Object.assign(err, improved);
+      }
+      return [err];
+    });
 }
+let formBodyForTicketCreation = async (ticketResp) => {
+  let { subject, description, priority, id } = ticketResp;
+  console.log(subject, description, priority, id)
+  let body = {
+    subject, description, priority, status: 2
+  };
+  console.log(body)
+  let err, reply;
+  [err, reply] = await to($request.invokeTemplate("createTicket", { body: JSON.stringify(body) }));
+  console.log(reply);
+  if (err) {
+    console.log("@TICKET CREATION IN MP")
+    console.log(err)
+  }
+};
