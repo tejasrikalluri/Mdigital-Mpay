@@ -9,7 +9,8 @@
       },
       "requests": {
         "fetchTicketData": {},
-        "createTicket": {}
+        "createTicket": {},
+        "fetchTicketFormFields": {}
       }
     }
   },

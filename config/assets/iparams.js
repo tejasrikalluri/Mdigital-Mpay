@@ -82,20 +82,31 @@ let iterateRemoveAttr = (ids) => {
         $(`#${element}`).removeAttr("state");
     });
 }
-function getTicketFields(client) {
+function to(promise, improved) {
+    return promise
+        .then((data) => [null, data])
+        .catch((err) => {
+            if (improved) {
+                Object.assign(err, improved);
+            }
+            return [err];
+        });
+}
+async function getTicketFields(client) {
     var domain = $("#domain").val();
     var api_key = $("#apiKey").val();
-    var headers = { "Authorization": "Basic " + btoa(api_key) };
-    var options = { headers: headers };
-    var url = `https://${domain}/api/v2/ticket_form_fields`;
-    client.request.get(url, options).then(function (data) {
+    let err, reply;
+    [err, reply] = await to(client.request.invokeTemplate("fetchTicketFormFields", { "context": { domain, api_key } }));
+    console.log(err);
+    if (err) {
+        handleError(err, "error_div");
+        buttonEnable("authBtn");
+    }
+    if (reply) {
         $("#authBtn").text("Authenticated");
         $(".authentication").hide();
-        appendCheckboxes(data, "md");
-    }, function (error) {
-        handleError(error, "error_div");
-        buttonEnable("authBtn");
-    });
+        appendCheckboxes(reply, "md");
+    }
 }
 let appendCheckboxes = (data, origin) => {
     console.log(origin)

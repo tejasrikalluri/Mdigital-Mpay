@@ -1,0 +1,33 @@
+{
+    "fetchTicketData": {
+        "schema": {
+            "method": "GET",
+            "path": "/api/v2/tickets/<%= context.id %>",
+            "host": "<%= iparams.domain %>",
+            "headers": {
+                "Authorization": "Basic <%= encode(iparam.api_key) %>"
+            }
+        }
+    },
+    "createTicket": {
+        "schema": {
+            "method": "POST",
+            "path": "/api/v2/tickets",
+            "host": "<%= context.domain %>",
+            "headers": {
+                "Authorization": "Basic <%= encode(context.api_key) %>",
+                "Content-Type": "application/json"
+            }
+        }
+    },
+    "fetchTicketFormFields": {
+        "schema": {
+            "method": "GET",
+            "path": "/api/v2/ticket_form_fields",
+            "host": "<%= context.domain %>",
+            "headers": {
+                "Authorization": "Basic <%= encode(context.api_key) %>"
+            }
+        }
+    }
+}
