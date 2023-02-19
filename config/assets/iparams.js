@@ -116,7 +116,7 @@ let appendCheckboxes = (data, origin) => {
         let ticket_fields = JSON.parse(data.response).ticket_fields;
         let custom_checkboxes = ticket_fields.filter(type => type.field_type === 'custom_checkbox');
         if (origin === "md") {
-            let checkboxSelectElement = `<fw-select id="checkboxes" placeholder="Choose custom checkbox" label="Choose checkbox in mondia digital" required="true">`;
+            let checkboxSelectElement = `<fw-select class="fw-mb-8" id="checkboxes" placeholder="Choose custom checkbox" label="Choose checkbox in mondia digital" required="true">`;
             for (const key in custom_checkboxes) {
                 checkboxSelectElement += `<fw-select-option value=${custom_checkboxes[key].name}>${custom_checkboxes[key].label}</fw-select-option>`;
             }
@@ -125,7 +125,7 @@ let appendCheckboxes = (data, origin) => {
             $(".custom_checkbox").show();
         }
         /* else {
-            let checkboxSelectElement = `<fw-select id="checkboxesMp" placeholder="Choose custom checkbox" label="Choose checkbox in mondia pay" required="true">`;
+            let checkboxSelectElement = `<fw-select id="checkboxesMp" class="fw-mb-8" placeholder="Choose custom checkbox" label="Choose checkbox in mondia pay" required="true">`;
             for (const key in custom_checkboxes) {
                 console.log(custom_checkboxes[key])
                 checkboxSelectElement += `<fw-select-option value=${custom_checkboxes[key].name}>${custom_checkboxes[key].label}</fw-select-option>`;
