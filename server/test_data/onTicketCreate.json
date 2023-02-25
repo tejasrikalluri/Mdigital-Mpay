@@ -6,7 +6,7 @@
   "event": "onTicketCreate",
   "data": {
     "ticket": {
-      "subject": "Support Needed...",
+      "subject": " test ticket please ignore",
       "description": "<div>Some details on the issue ..</div>",
       "is_description_truncated": false,
       "description_text": "Some details on the issue ...",
@@ -24,7 +24,7 @@
         "diana@freshservice.com"
       ],
       "email_config_id": 77123,
-      "id": 1569,
+      "id": 2156519,
       "group_id": 351,
       "group_name": "Service Desk",
       "department_id": 2,

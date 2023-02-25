@@ -3,7 +3,7 @@
         "schema": {
             "method": "GET",
             "path": "/api/v2/tickets/<%= context.id %>",
-            "host": "<%= iparams.domain %>",
+            "host": "<%= iparam.domain %>",
             "headers": {
                 "Authorization": "Basic <%= encode(iparam.api_key) %>"
             }
@@ -13,9 +13,9 @@
         "schema": {
             "method": "POST",
             "path": "/api/v2/tickets",
-            "host": "<%= context.domain %>",
+            "host": "<%= iparam.domain_mp %>",
             "headers": {
-                "Authorization": "Basic <%= encode(context.api_key) %>",
+                "Authorization": "Basic <%= encode(iparam.apiKeyMp) %>",
                 "Content-Type": "application/json"
             }
         }
