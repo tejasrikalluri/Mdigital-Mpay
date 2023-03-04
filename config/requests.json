@@ -20,6 +20,28 @@
             }
         }
     },
+    "createPrivateNote": {
+        "schema": {
+            "method": "POST",
+            "path": "/api/v2/tickets/<%= context.id %>/notes",
+            "host": "<%= iparam.domain %>",
+            "headers": {
+                "Authorization": "Basic <%= encode(iparam.api_key) %>",
+                "Content-Type": "application/json"
+            }
+        }
+    },
+    "createPrivateNoteMP": {
+        "schema": {
+            "method": "POST",
+            "path": "/api/v2/tickets/<%= context.id %>/notes",
+            "host": "<%= iparam.domain_mp %>",
+            "headers": {
+                "Authorization": "Basic <%= encode(iparam.apiKeyMp) %>",
+                "Content-Type": "application/json"
+            }
+        }
+    },
     "fetchTicketFormFields": {
         "schema": {
             "method": "GET",

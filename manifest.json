@@ -5,12 +5,17 @@
       "events": {
         "onTicketCreate": {
           "handler": "onTicketCreateHandler"
+        },
+        "onConversationCreate": {
+          "handler": "onConversationCreateCallback"
         }
       },
       "requests": {
         "fetchTicketData": {},
         "createTicket": {},
-        "fetchTicketFormFields": {}
+        "fetchTicketFormFields": {},
+        "createPrivateNote": {},
+        "createPrivateNoteMP": {}
       }
     }
   },
