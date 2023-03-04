@@ -8,6 +8,15 @@
         },
         "onConversationCreate": {
           "handler": "onConversationCreateCallback"
+        },
+        "onAppInstall": {
+          "handler": "onAppInstallCallback"
+        },
+        "onExternalEvent": {
+          "handler": "onExternalEventHandler"
+        },
+        "onAppUninstall": {
+          "handler": "onAppUninstallHandler"
         }
       },
       "requests": {
@@ -15,7 +24,8 @@
         "createTicket": {},
         "fetchTicketFormFields": {},
         "createPrivateNote": {},
-        "createPrivateNoteMP": {}
+        "createPrivateNoteMP": {},
+        "fetchTicketNotes": {}
       }
     }
   },

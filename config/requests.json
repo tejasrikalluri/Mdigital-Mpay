@@ -9,6 +9,16 @@
             }
         }
     },
+    "fetchTicketNotes": {
+        "schema": {
+            "method": "GET",
+            "path": "/api/v2/tickets/<%= context.id %>/conversations",
+            "host": "<%= iparam.domain_mp %>",
+            "headers": {
+                "Authorization": "Basic <%= encode(iparam.apiKeyMp) %>"
+            }
+        }
+    },
     "createTicket": {
         "schema": {
             "method": "POST",

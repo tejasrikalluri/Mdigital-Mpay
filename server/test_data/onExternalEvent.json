@@ -5,9 +5,8 @@
   "region": "US",
   "domain": "example.freshservice.com",
   "data": {
-    "message": {
-      "id": 123456,
-      "action": "asset_added"
+    "freshdesk_webhook": {
+      "ticket_id": "SR-218283"
     }
   },
   "headers": {

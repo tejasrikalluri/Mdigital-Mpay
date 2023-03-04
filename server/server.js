@@ -5,11 +5,42 @@ exports = {
     const { email } = args.data.requester;
     fetchTicketData(id, args.iparams, email);
   }, onConversationCreateCallback: function (payload) {
+    console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCC")
     const { source, body, ticket_id } = payload.data.conversation;
     if (source === 2 || source === 0)
       createPrivateNoteSync(source, body, ticket_id, payload.iparams);
+  },
+  onAppInstallCallback: function () {
+    console.log("AT APP INSTALL EVENT HITTED")
+    generateTargetUrl().then(function (url) {
+      console.log(url)
+      renderData(url);
+    }, function (err) {
+      console.error(err)
+      renderData(err);
+    });
+  }, onAppUninstallHandler: function (payload) {
+    console.log(payload)
+
+  }, onExternalEventHandler: function (payload) {
+    console.log(payload)
+    console.log(payload.data)
+    console.log(payload.data.freshdesk_webhook)
+    const { ticket_id } = payload.data.freshdesk_webhook;
+    console.log(ticket_id)
+    fetchTicketNotes(ticket_id.split("-")[1])
   }
 };
+let fetchTicketNotes = async (id) => {
+  try {
+    let data = await $request.invokeTemplate("fetchTicketNotes", { context: { id } });
+    let ticketResp = JSON.parse(data.response);
+    console.log(ticketResp)
+  } catch (error) {
+    console.log("@FETCH notes DATA")
+    console.error(error);
+  }
+}
 let fetchTicketData = async (id, iparams, email) => {
   try {
     let data = await $request.invokeTemplate("fetchTicketData", { context: { id } });
@@ -24,19 +55,27 @@ let fetchTicketData = async (id, iparams, email) => {
   }
 };
 let createPrivateNoteSync = async (source, body, ticket_id, iparams) => {
+  console.log("CCCCCCCCCcccccccccppppppppppppppppppp")
   let note_body = {
     incoming: true
   };
   note_body.body = (source === 0) ? "Reply has been added to mondia digital <br/>" + body : "Note has been added to mondia digital" + body;
-  try {
-    let data = await $request.invokeTemplate("createPrivateNoteMP", { body: JSON.stringify(note_body), context: { id: ticket_id, domain: iparams.domain_mp }, apiKey: iparams.apiKeyMp });
-    if (data) {
-      console.info(`Private note has been created for ticket ${ticket_id} in ${arr[0].domain}`)
+  console.log("******************")
+  console.log(ticket_id)
+  $db.get(ticket_id).then(function (data) {
+    console.log(data.mondiaPay)
+    try {
+      console.log("*****************************")
+      let dataP = $request.invokeTemplate("createPrivateNoteMP", { body: JSON.stringify(note_body), context: { id: data.mondiaPay, domain: iparams.domain_mp }, apiKey: iparams.apiKeyMp });
+      if (dataP)
+        console.info(`Private note has been created for ticket ${data.mondiaPay} in ${iparams.domain_mp}`);
+    } catch (error) {
+      console.log(`@createPrivateNoteSync CREATION in ${iparams.domain_mp}`)
+      console.error(error)
     }
-  } catch (error) {
-    console.log(`@Note CREATION in ${arr[0].domain}`)
-    console.error(error)
-  }
+  }, function (error) {
+    console.log(error)
+  });
 }
 let formBodyForTicketCreation = async (ticketResp, email, iparams) => {
   let { subject, description, priority, id, type } = ticketResp;
@@ -64,6 +103,7 @@ let formBodyForTicketCreation = async (ticketResp, email, iparams) => {
 
 let createPrivateNote = async (arr) => {
   let body = {
+    incoming: true,
     body: `Test note please ignore`
   };
 
