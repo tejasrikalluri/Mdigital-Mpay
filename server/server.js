@@ -24,12 +24,29 @@ exports = {
     console.log("External event hitted")
     console.log(payload)
     console.log(payload.data)
-    const { ticket_id, ticket_status } = payload.data.freshdesk_webhook;
-    console.log(ticket_id, ticket_status);
-    (!ticket_status) ?
-      fetchTicketNotes(ticket_id.split("-")[1], payload) : createPrivateStatusSync(ticket_id.split("-")[1], payload.iparams, ticket_status);
+    const { ticket_id, ticket_status, ticket_requester_email } = payload.data.freshdesk_webhook;
+    let string = `ticket_${payload.iparams.checkboxes}`;
+    console.log(string)
+    console.log(ticket_id, ticket_status, payload.data.freshdesk_webhook[string], ticket_requester_email);
+    if (!ticket_status && !ticket_requester_email) fetchTicketNotes(ticket_id.split("-")[1], payload);
+    else if (ticket_requester_email) fetchTicketID(ticket_id.split("-")[1], payload.iparams, ticket_requester_email);
+    else
+      createPrivateStatusSync(ticket_id.split("-")[1], payload.iparams, ticket_status);
   }
 };
+let fetchTicketID = (ticket_id, iparams, email) => {
+  $db.get(`ticket_mondia:${ticket_id}`).then(function (data) {
+    console.log(data.mondiaPay)
+  }, function (error) {
+    if (error.status === 404) {
+      console.log()
+      fetchTicketData(ticket_id, iparams, email);
+    } else {
+      console.log("in fetchTicketID()")
+      console.error(error)
+    }
+  });
+}
 let fetchTicketNotes = async (id, payload) => {
   try {
     let data = await $request.invokeTemplate("fetchTicketNotes", { context: { id } });
@@ -120,7 +137,7 @@ let formBodyForTicketCreation = async (ticketResp, email, iparams) => {
   let body = {
     subject, description, priority, status: 2, email, custom_fields: {
       "mpay_priority": "Low"
-    }, type:"Incident"
+    }, type: "Incident"
   };
   console.log(body)
   console.log(id)
@@ -142,7 +159,7 @@ let formBodyForTicketCreation = async (ticketResp, email, iparams) => {
 let createPrivateNote = async (arr) => {
   let body = {
     incoming: true,
-    body: `This ticket has been linked to Mondia Pay ticket`
+    body: `This ticket has been linked to Mondia Digital ticket #<a href="https://${arr[1].domain}/a/tickets/${arr[1].id}" target="_blank">${arr[1].id}</a>`
   };
 
   console.log(body)
@@ -155,6 +172,7 @@ let createPrivateNote = async (arr) => {
     console.log(`@Note CREATION in ${arr[0].domain}`)
     console.error(error)
   }
+  body.body = `This ticket has been linked to Mondia pay ticket #<a href="https://${arr[0].domain}/a/tickets/${arr[0].id}" target="_blank">${arr[0].id}</a>`
   try {
     let data = await $request.invokeTemplate("createPrivateNote", { body: JSON.stringify(body), context: { id: arr[1].id, domain: arr[1].domain }, apiKey: arr[1].apiKey });
     if (data) {
