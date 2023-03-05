@@ -12,7 +12,6 @@ exports = {
       createPrivateNoteInMP(source, body, ticket_id, payload.iparams);
   },
   onAppInstallCallback: function () {
-    console.log("AT APP INSTALL EVENT HITTED")
     generateTargetUrl().then(function (url) {
       console.log(url)
       renderData();
@@ -21,15 +20,10 @@ exports = {
       console.error(err)
       renderData(err);
     });
-  }, onAppUninstallHandler: function (payload) {
-    console.log("AT APP unistall EVENT HITTED")
-    console.log(payload)
-    renderData();
   }, onExternalEventHandler: function (payload) {
     console.log("External event hitted")
     console.log(payload)
     console.log(payload.data)
-    console.log(payload.data.freshdesk_webhook)
     const { ticket_id, ticket_status } = payload.data.freshdesk_webhook;
     console.log(ticket_id, ticket_status);
     (!ticket_status) ?
@@ -65,7 +59,7 @@ let createPrivateNoteInMP = async (source, body, ticket_id, iparams) => {
   let note_body = {
     incoming: true
   };
-  note_body.body = (source === 0) ? "Reply has been added to mondia digital <br/>" + body : "Note has been added to mondia digital" + body;
+  note_body.body = (source === 0) ? "Reply has been added to Mondia Digital: <br/>" + body : "Note has been added to Mondia Digital: <br/>" + body;
   console.log(ticket_id);
   $db.get(`ticket_mondia:${ticket_id}`).then(function (data) {
     console.log(data.mondiaPay)
@@ -85,7 +79,7 @@ let createPrivateNoteSync = async (source, body, ticket_id, iparams) => {
   let note_body = {
     incoming: true
   };
-  note_body.body = (source === 0) ? "Reply has been added to mondia pay <br/>" + body : "Note has been added to mondia pay" + body;
+  note_body.body = (source === 0) ? "Reply has been added to Mondia Pay: <br/>" + body : "Note has been added to Mondia Pay: <br/>" + body;
   console.log(ticket_id)
   $db.get(`ticket_mp:${ticket_id}`).then(function (data) {
     console.log(data.mondia)
@@ -103,7 +97,7 @@ let createPrivateNoteSync = async (source, body, ticket_id, iparams) => {
 };
 let createPrivateStatusSync = async (ticket_id, iparams, status) => {
   let note_body = {
-    incoming: true, body: `Status has been changed to ${status} in mondia pay #${ticket_id}`
+    incoming: true, body: `Linked ticket Status has been changed to '${status}' in Mondia Pay ticket: #${ticket_id}`
   };
   console.log(ticket_id)
   $db.get(`ticket_mp:${ticket_id}`).then(function (data) {
@@ -122,11 +116,11 @@ let createPrivateStatusSync = async (ticket_id, iparams, status) => {
 };
 
 let formBodyForTicketCreation = async (ticketResp, email, iparams) => {
-  let { subject, description, priority, id, type } = ticketResp;
+  let { subject, description, priority, id } = ticketResp;
   let body = {
     subject, description, priority, status: 2, email, custom_fields: {
       "mpay_priority": "Low"
-    }, type
+    }, type:"Incident"
   };
   console.log(body)
   console.log(id)
@@ -134,7 +128,7 @@ let formBodyForTicketCreation = async (ticketResp, email, iparams) => {
     let data = await $request.invokeTemplate("createTicket", { body: JSON.stringify(body) });
     if (data) {
       let mp_id = JSON.parse(data.response).ticket.id;
-      console.info("Ticket created successfully in mondia pay")
+      console.info("Ticket created successfully in Mondia Pay")
       let ticketsArr = [{ id: mp_id, domain: iparams.domain_mp, apiKey: iparams.apiKeyMp }, { id, domain: iparams.domain, apiKey: iparams.api_key }];
       console.log(ticketsArr)
       createPrivateNote(ticketsArr);
@@ -148,7 +142,7 @@ let formBodyForTicketCreation = async (ticketResp, email, iparams) => {
 let createPrivateNote = async (arr) => {
   let body = {
     incoming: true,
-    body: `Test note please ignore`
+    body: `This ticket has been linked to Mondia Pay ticket`
   };
 
   console.log(body)
