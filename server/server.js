@@ -5,42 +5,49 @@ exports = {
     const { email } = args.data.requester;
     fetchTicketData(id, args.iparams, email);
   }, onConversationCreateCallback: function (payload) {
-    console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCC")
-    const { source, body, ticket_id } = payload.data.conversation;
-    if (source === 2 || source === 0)
-      createPrivateNoteSync(source, body, ticket_id, payload.iparams);
+    console.log("Conversation create event hitted")
+    const { source, body, ticket_id, incoming } = payload.data.conversation;
+    console.log("incoming-" + incoming)
+    if ((source === 2 || source === 0) && !incoming)
+      createPrivateNoteInMP(source, body, ticket_id, payload.iparams);
   },
   onAppInstallCallback: function () {
     console.log("AT APP INSTALL EVENT HITTED")
     generateTargetUrl().then(function (url) {
       console.log(url)
-      renderData(url);
+      renderData();
     }, function (err) {
+      console.log("@App install event")
       console.error(err)
       renderData(err);
     });
   }, onAppUninstallHandler: function (payload) {
+    console.log("AT APP unistall EVENT HITTED")
     console.log(payload)
-
+    renderData();
   }, onExternalEventHandler: function (payload) {
+    console.log("External event hitted")
     console.log(payload)
     console.log(payload.data)
     console.log(payload.data.freshdesk_webhook)
-    const { ticket_id } = payload.data.freshdesk_webhook;
-    console.log(ticket_id)
-    fetchTicketNotes(ticket_id.split("-")[1])
+    const { ticket_id, ticket_status } = payload.data.freshdesk_webhook;
+    console.log(ticket_id, ticket_status);
+    (!ticket_status) ?
+      fetchTicketNotes(ticket_id.split("-")[1], payload) : createPrivateStatusSync(ticket_id.split("-")[1], payload.iparams, ticket_status);
   }
 };
-let fetchTicketNotes = async (id) => {
+let fetchTicketNotes = async (id, payload) => {
   try {
     let data = await $request.invokeTemplate("fetchTicketNotes", { context: { id } });
-    let ticketResp = JSON.parse(data.response);
-    console.log(ticketResp)
+    let convData = JSON.parse(data.response).conversations[0];
+    console.log(convData.incoming)
+    if ((convData.source === 2 || convData.source === 0) && !convData.incoming)
+      createPrivateNoteSync(convData.source, convData.body, convData.ticket_id, payload.iparams);
   } catch (error) {
     console.log("@FETCH notes DATA")
     console.error(error);
   }
-}
+};
 let fetchTicketData = async (id, iparams, email) => {
   try {
     let data = await $request.invokeTemplate("fetchTicketData", { context: { id } });
@@ -54,29 +61,66 @@ let fetchTicketData = async (id, iparams, email) => {
     console.error(error);
   }
 };
-let createPrivateNoteSync = async (source, body, ticket_id, iparams) => {
-  console.log("CCCCCCCCCcccccccccppppppppppppppppppp")
+let createPrivateNoteInMP = async (source, body, ticket_id, iparams) => {
   let note_body = {
     incoming: true
   };
   note_body.body = (source === 0) ? "Reply has been added to mondia digital <br/>" + body : "Note has been added to mondia digital" + body;
-  console.log("******************")
-  console.log(ticket_id)
-  $db.get(ticket_id).then(function (data) {
+  console.log(ticket_id);
+  $db.get(`ticket_mondia:${ticket_id}`).then(function (data) {
     console.log(data.mondiaPay)
     try {
-      console.log("*****************************")
       let dataP = $request.invokeTemplate("createPrivateNoteMP", { body: JSON.stringify(note_body), context: { id: data.mondiaPay, domain: iparams.domain_mp }, apiKey: iparams.apiKeyMp });
       if (dataP)
         console.info(`Private note has been created for ticket ${data.mondiaPay} in ${iparams.domain_mp}`);
     } catch (error) {
-      console.log(`@createPrivateNoteSync CREATION in ${iparams.domain_mp}`)
+      console.log(`@createPrivateNoteInMP CREATION in ${iparams.domain_mp}`)
       console.error(error)
     }
   }, function (error) {
     console.log(error)
   });
 }
+let createPrivateNoteSync = async (source, body, ticket_id, iparams) => {
+  let note_body = {
+    incoming: true
+  };
+  note_body.body = (source === 0) ? "Reply has been added to mondia pay <br/>" + body : "Note has been added to mondia pay" + body;
+  console.log(ticket_id)
+  $db.get(`ticket_mp:${ticket_id}`).then(function (data) {
+    console.log(data.mondia)
+    try {
+      let dataP = $request.invokeTemplate("createPrivateNote", { body: JSON.stringify(note_body), context: { id: data.mondia, domain: iparams.domain }, apiKey: iparams.api_key });
+      if (dataP)
+        console.info(`Private note has been created for ticket ${data.mondia} in ${iparams.domain}`);
+    } catch (error) {
+      console.log(`@createPrivateNoteSync CREATION in ${iparams.domain}`)
+      console.error(error)
+    }
+  }, function (error) {
+    console.log(error)
+  });
+};
+let createPrivateStatusSync = async (ticket_id, iparams, status) => {
+  let note_body = {
+    incoming: true, body: `Status has been changed to ${status} in mondia pay #${ticket_id}`
+  };
+  console.log(ticket_id)
+  $db.get(`ticket_mp:${ticket_id}`).then(function (data) {
+    console.log(data.mondia)
+    try {
+      let dataP = $request.invokeTemplate("createPrivateNote", { body: JSON.stringify(note_body), context: { id: data.mondia, domain: iparams.domain }, apiKey: iparams.api_key });
+      if (dataP)
+        console.info(`Private note has been created for ticket ${data.mondia} in ${iparams.domain}`);
+    } catch (error) {
+      console.log(`@createPrivateStatusSync CREATION in ${iparams.domain}`)
+      console.error(error)
+    }
+  }, function (error) {
+    console.log(error)
+  });
+};
+
 let formBodyForTicketCreation = async (ticketResp, email, iparams) => {
   let { subject, description, priority, id, type } = ticketResp;
   let body = {
@@ -129,10 +173,19 @@ let createPrivateNote = async (arr) => {
   }
 }
 let linkTicket = (arr) => {
-  $db.set(arr[1].id, { "mondiaPay": arr[0].id }).then(function () {
+  $db.set(`ticket_mondia:${arr[1].id}`, { "mondiaPay": arr[0].id }).then(function () {
     console.info(`Succesfully linked ticket of ${arr[1].id} to ${arr[0].id}`)
+    linkTicketMp(arr);
   }, function (error) {
     console.log(`@link CREATION`)
+    console.error(error)
+  });
+}
+let linkTicketMp = (arr) => {
+  $db.set(`ticket_mp:${arr[0].id}`, { "mondia": arr[1].id }).then(function () {
+    console.info(`Succesfully linked ticket of ${arr[0].id} to ${arr[1].id}`)
+  }, function (error) {
+    console.log(`@link linkTicketMp`)
     console.error(error)
   });
 }
