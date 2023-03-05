@@ -14,9 +14,6 @@
         },
         "onExternalEvent": {
           "handler": "onExternalEventHandler"
-        },
-        "onAppUninstall": {
-          "handler": "onAppUninstallHandler"
         }
       },
       "requests": {
