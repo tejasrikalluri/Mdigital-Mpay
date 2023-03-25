@@ -2,6 +2,11 @@
   "platform-version": "2.3",
   "product": {
     "freshservice": {
+      "location": {
+        "ticket_background": {
+          "url": "index.html"
+        }
+      },
       "events": {
         "onTicketCreate": {
           "handler": "onTicketCreateHandler"
@@ -28,6 +33,6 @@
   },
   "engines": {
     "node": "14.17.3",
-    "fdk": "8.6.6"
+    "fdk": "9.0.0"
   }
 }
