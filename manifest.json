@@ -3,14 +3,11 @@
   "product": {
     "freshservice": {
       "location": {
-        "ticket_background": {
+        "new_ticket_background": {
           "url": "index.html"
         }
       },
       "events": {
-        "onTicketCreate": {
-          "handler": "onTicketCreateHandler"
-        },
         "onConversationCreate": {
           "handler": "onConversationCreateCallback"
         },
