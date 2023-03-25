@@ -22,3 +22,6 @@ Explore [more of app sample apps](https://community.developers.freshworks.com/t/
 
 ## version changes
 change note messages to -> by
+hidden selected check box in new ticket page for incidents only
+removed ticket create event logic
+removed reply sync
