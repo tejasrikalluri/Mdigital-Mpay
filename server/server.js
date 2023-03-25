@@ -1,15 +1,10 @@
 exports = {
-  onTicketCreateHandler: function (args) {
-    console.log("Ticket create event hitted")
-    const { id } = args.data.ticket;
-    const { email } = args.data.requester;
-    fetchTicketData(id, args.iparams, email);
-  }, onConversationCreateCallback: function (payload) {
+  onConversationCreateCallback: function (payload) {
     console.log("Conversation create event hitted")
     const { source, body, ticket_id, incoming } = payload.data.conversation;
     console.log("incoming-" + incoming)
-    if ((source === 2 || source === 0) && !incoming)
-      createPrivateNoteInMP(source, body, ticket_id, payload.iparams);
+    if (source === 2 && !incoming)
+      createPrivateNoteInMP(body, ticket_id, payload.iparams);
   },
   onAppInstallCallback: function () {
     generateTargetUrl().then(function (url) {
@@ -37,9 +32,9 @@ exports = {
 let fetchTicketID = (ticket_id, iparams, email) => {
   $db.get(`ticket_mondia:${ticket_id}`).then(function (data) {
     console.log(data.mondiaPay)
+    console.log("ticket data available in DB")
   }, function (error) {
     if (error.status === 404) {
-      console.log()
       fetchTicketData(ticket_id, iparams, email);
     } else {
       console.log("in fetchTicketID()")
@@ -52,8 +47,8 @@ let fetchTicketNotes = async (id, payload) => {
     let data = await $request.invokeTemplate("fetchTicketNotes", { context: { id } });
     let convData = JSON.parse(data.response).conversations[0];
     console.log(convData.incoming)
-    if ((convData.source === 2 || convData.source === 0) && !convData.incoming)
-      createPrivateNoteSync(convData.source, convData.body, convData.ticket_id, payload.iparams);
+    if (convData.source === 2 && !convData.incoming)
+      createPrivateNoteSync(convData.body, convData.ticket_id, payload.iparams);
   } catch (error) {
     console.log("@FETCH notes DATA")
     console.error(error);
@@ -72,11 +67,11 @@ let fetchTicketData = async (id, iparams, email) => {
     console.error(error);
   }
 };
-let createPrivateNoteInMP = async (source, body, ticket_id, iparams) => {
+let createPrivateNoteInMP = async (body, ticket_id, iparams) => {
   let note_body = {
     incoming: true
   };
-  note_body.body = (source === 0) ? "Reply has been added by Mondia Digital: <br/>" + body : "Note has been added by Mondia Digital: <br/>" + body;
+  note_body.body = "Note has been added by Mondia Digital: <br/>" + body;
   console.log(ticket_id);
   $db.get(`ticket_mondia:${ticket_id}`).then(function (data) {
     console.log(data.mondiaPay)
@@ -92,11 +87,11 @@ let createPrivateNoteInMP = async (source, body, ticket_id, iparams) => {
     console.log(error)
   });
 }
-let createPrivateNoteSync = async (source, body, ticket_id, iparams) => {
+let createPrivateNoteSync = async (body, ticket_id, iparams) => {
   let note_body = {
     incoming: true
   };
-  note_body.body = (source === 0) ? "Reply has been added by Mondia Pay: <br/>" + body : "Note has been added by Mondia Pay: <br/>" + body;
+  note_body.body =  "Note has been added by Mondia Pay: <br/>" + body;
   console.log(ticket_id)
   $db.get(`ticket_mp:${ticket_id}`).then(function (data) {
     console.log(data.mondia)
