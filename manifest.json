@@ -5,6 +5,9 @@
       "location": {
         "new_ticket_background": {
           "url": "index.html"
+        },
+        "ticket_background": {
+          "url": "index.html"
         }
       },
       "events": {
