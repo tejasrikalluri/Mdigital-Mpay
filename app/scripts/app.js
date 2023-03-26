@@ -20,11 +20,8 @@ document.onreadystatechange = function () {
 function renderAppPlaceholder() {
   console.log("initialized...............")
   client.instance.context().then(function (context) {
-    if (context.location === 'new_ticket_background') {
-      client.interface.trigger("hideElement", { id: checkboxes });
-    }
+    context.location === 'new_ticket_background' ? client.interface.trigger("hideElement", { id: checkboxes }) : fetchTicketDetails();
   });
-  fetchTicketDetails();
 }
 let fetchTicketDetails = () => {
   client.data.get("ticket").then(function (data) {
