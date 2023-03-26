@@ -57,7 +57,6 @@ let fetchTicketID = (ticket_id) => {
   }, function (error) {
     console.log("in fetchTicketID()")
     console.error(error)
-    showNotification(error);
   });
 }
 let createPrivateNote = async (arr) => {
