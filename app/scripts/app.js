@@ -8,7 +8,9 @@ document.onreadystatechange = function () {
       client.iparams.get("checkboxes").then(function (data) {
         window.checkboxes = data.checkboxes;
       }, function (error) {
+        console.log("in iparams checkboxes data()")
         console.log(error);
+        showNotification(error);
       });
       renderAppPlaceholder();
     }).catch(handleErr);
@@ -26,33 +28,39 @@ function renderAppPlaceholder() {
 }
 let fetchTicketDetails = () => {
   client.data.get("ticket").then(function (data) {
-    let checkboxVal;
     console.log(data.ticket)
-    const { custom_field, id } = data.ticket;
-    for (let key in custom_field) {
-      if (key.indexOf(checkboxes) > -1) {
-        checkboxVal = custom_field[key];
-      }
-    }
+    const { display_id } = data.ticket;
+    console.log(display_id)
     var propertyChangeCallback = function (event) {
       console.log(event.type + " event occurred");
       var event_data = event.helper.getData();
-      if (event_data[checkboxes] && event_data[checkboxes].value === "false")
-        fetchTicketID(id);
+      if (event_data[checkboxes] && event_data[checkboxes].value === "false") { fetchTicketID(display_id); }
     };
     client.events.on("ticket.propertiesUpdated", propertyChangeCallback);
   }, function (error) {
+    console.log("in ticket data()")
     console.log(error)
+    showNotification(error);
   });
 }
 
 let fetchTicketID = (ticket_id) => {
-  $db.delete(`ticket_mondia:${ticket_id}`).then(function () {
-    console.log("Ticket deteled succcessfully in DB")
-    let ticketsArr = [{ id: mp_id, domain: iparams.domain_mp, apiKey: iparams.apiKeyMp }, { id, domain: iparams.domain, apiKey: iparams.api_key }];
-    createPrivateNote();
+  client.db.get(`ticket_mondia:${ticket_id}`).then(function (data) {
+    console.log(data.mondiaPay)
+    const { mondiaPay } = data;
+    client.iparams.get().then(function (iparams) {
+      console.log(iparams)
+      let ticketsArr = [{ id: mondiaPay, domain: iparams.domain_mp, apiKey: iparams.apiKeyMp }, { id: ticket_id, domain: iparams.domain, apiKey: iparams.api_key }];
+      createPrivateNote(ticketsArr);
+    }, function (error) {
+      console.log("in iparams()")
+      console.log(error);
+      showNotification(error);
+    });
   }, function (error) {
-    console.log(error)
+    console.log("in fetchTicketID()")
+    console.error(error)
+    showNotification(error);
   });
 }
 let createPrivateNote = async (arr) => {
@@ -62,16 +70,42 @@ let createPrivateNote = async (arr) => {
   };
   console.log(body)
   try {
-    let data = await $request.invokeTemplate("createPrivateNote", { body: JSON.stringify(body), context: { id: arr[1].id, domain: arr[1].domain }, apiKey: arr[1].apiKey });
+    let data = await client.request.invokeTemplate("createPrivateNote", { body: JSON.stringify(body), context: { id: arr[1].id, domain: arr[1].domain }, apiKey: arr[1].apiKey });
     if (data) {
       console.info(`Private note has been created for ticket ${arr[1].id} in ${arr[1].domain}`)
-      linkTicket(arr);
+      unlinkTicket(arr);
     }
   } catch (error) {
     console.log(`@Note CREATION in ${arr[1].domain}`)
     console.error(error)
+    showNotification(error);
   }
 }
 function handleErr(err = 'None') {
   console.error(`Error occured. Details:`, err);
+}
+let unlinkTicket = (arr) => {
+  client.db.delete(`ticket_mondia:${arr[1].id}`).then(function () {
+    console.info(`Succesfully unlinked ticket of ${arr[1].id} to ${arr[0].id}`)
+    unlinkTicketMp(arr);
+  }, function (error) {
+    console.log(`@unlink CREATION`)
+    console.error(error)
+    showNotification(error);
+  });
+}
+let unlinkTicketMp = (arr) => {
+  client.db.delete(`ticket_mp:${arr[0].id}`).then(function () {
+    console.info(`Succesfully unlinked ticket of ${arr[0].id} to ${arr[1].id}`)
+  }, function (error) {
+    console.log(`@link unlinkTicketMp`)
+    console.error(error)
+    showNotification(error);
+  });
+}
+
+let showNotification = (message) => {
+  client.interface.trigger("showNotify", {
+    type: "error", message
+  });
 }
