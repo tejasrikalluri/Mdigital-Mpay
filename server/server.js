@@ -91,7 +91,7 @@ let createPrivateNoteSync = async (source, body, ticket_id, iparams) => {
   let note_body = {
     incoming: true
   };
-  note_body.body = (source === 0) ? "Reply has been added to Mondia Pay: <br/>" + body : "Note has been added by Mondia Pay: <br/>" + body;
+  note_body.body = (source === 0) ? "Reply has been added by Mondia Pay: <br/>" + body : "Note has been added by Mondia Pay: <br/>" + body;
   console.log(ticket_id)
   $db.get(`ticket_mp:${ticket_id}`).then(function (data) {
     console.log(data.mondia)
