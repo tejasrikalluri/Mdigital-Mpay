@@ -21,8 +21,4 @@ Congratulations on creating your App Project! Feel free to replace this text wit
 Explore [more of app sample apps](https://community.developers.freshworks.com/t/freshworks-sample-apps/3604) on the Freshworks github respository.
 
 ## version changes
-change note messages to -> by
-hidden selected check box in new ticket page for incidents only
-removed ticket create event logic
-removed reply sync
-uncheck property added based on that unlinking with mondia pay
+added servicedesk@mondia.com as requester in mondia pay
