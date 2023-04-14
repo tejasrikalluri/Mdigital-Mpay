@@ -132,7 +132,7 @@ let createPrivateStatusSync = async (ticket_id, iparams, status) => {
 let formBodyForTicketCreation = async (ticketResp, iparams) => {
   let { subject, description, priority, id } = ticketResp;
   let body = {
-    subject, description, priority, status: 2, email: 'servicedesk@mondia.com', custom_fields: {
+    subject, description, priority, status: 2, email: 'mondiadigital-sdmpay@mondia.com', custom_fields: {
       "mpay_priority": "Low"
     }, type: "Incident"
   };

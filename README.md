@@ -21,4 +21,4 @@ Congratulations on creating your App Project! Feel free to replace this text wit
 Explore [more of app sample apps](https://community.developers.freshworks.com/t/freshworks-sample-apps/3604) on the Freshworks github respository.
 
 ## version changes
-added servicedesk@mondia.com as requester in mondia pay
+added mondiadigital-sdmpay@mondia.com as requester in mondia pay
